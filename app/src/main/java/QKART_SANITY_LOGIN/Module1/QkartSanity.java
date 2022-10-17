@@ -54,7 +54,7 @@ public class QkartSanity {
         // Visit the Registration page and register a new user
         Register registration = new Register(driver);
         registration.navigateToRegisterPage();
-        status = registration.registerUser("testUser", "abc@123", true);
+        status = registration.registerUser("harisami73", "abc@123", true);
         if (!status) {
              logStatus("TestCase 1", "Test Case Pass. User Registration Pass", "PASS");
             logStatus("End TestCase", "Test Case 1: Verify user Registration : ", status ? "PASS" : "FAIL");

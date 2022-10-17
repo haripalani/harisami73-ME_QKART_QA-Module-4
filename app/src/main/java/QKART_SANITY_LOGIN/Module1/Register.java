@@ -45,25 +45,16 @@ public class Register {
         // Find the password Text Box
         WebElement password_txt_box = this.driver.findElement(By.id("password"));
         String test_data_password = Password;
-
         // Enter the Password value
         password_txt_box.sendKeys(test_data_password);
-
         // Find the Confirm password text box
-        WebElement confirm_password_txt_box;
-         confirm_password_txt_box = this.driver.findElement(By.id("password"));
-
+        WebElement confirm_password_txt_box = this.driver.findElement(By.id("confirmPassword"));
         // Enter the Confirm Password Value
         confirm_password_txt_box.sendKeys(test_data_password);
-
         // Find the register now button
         WebElement register_now_button = this.driver.findElement(By.className("button"));
-
         // Click the register now button
         register_now_button.click();
-
-
-
         this.lastGeneratedUsername = test_data_username;
 
         return this.driver.getCurrentUrl().endsWith("/login");
