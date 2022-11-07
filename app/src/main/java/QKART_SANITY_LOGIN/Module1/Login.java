@@ -1,6 +1,6 @@
 package QKART_SANITY_LOGIN.Module1;
 
-//import java.time.Duration;
+import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -30,18 +30,25 @@ public class Login {
 
         // Enter the username
         username_txt_box.sendKeys(Username);
+
         // Wait for user name to be entered
         Thread.sleep(1000);
+
         // Find the password Text Box
         WebElement password_txt_box = this.driver.findElement(By.id("password"));
+
         // Enter the password
         password_txt_box.sendKeys(Password);
+
         // Find the Login Button
         WebElement login_button = driver.findElement(By.className("button"));
+
         // Click the login Button
         login_button.click();
+
         // Wait for Login action to complete
         Thread.sleep(5000);
+
         return this.VerifyUserLoggedIn(Username);
     }
 
@@ -49,7 +56,7 @@ public class Login {
         try {
             // Find the username label (present on the top right of the page)
             WebElement username_label;
-             username_label = this.driver.findElement(By.id("username-text"));
+            username_label = this.driver.findElement(By.className("username-text"));
             return username_label.getText().equals(Username);
         } catch (Exception e) {
             return false;
