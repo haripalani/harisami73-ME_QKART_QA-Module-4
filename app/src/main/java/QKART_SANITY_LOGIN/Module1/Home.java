@@ -168,95 +168,41 @@ public class Home {
             // Increment or decrement the quantity of the matching product until the current
             // quantity is reached (Note: Keep a look out when then input quantity is 0,
             // here we need to remove the item completely from the cart)
-            // List<WebElement> cartItemElements = driver.findElements(By.xpath(
-            //         "//div[@class='cart MuiBox-root css-0']//div[@class='MuiBox-root css-0']"));
-            // for (WebElement cartItemElement : cartItemElements) {
-            //     String actualProductName = cartItemElement
-            //             .findElement(By.xpath("//div[@class='MuiBox-root css-1gjj37g']/div[1]"))
-            //             .getText();
-            //     if (actualProductName.equals(productName)) {
-            //         String quantityString = cartItemElement
-            //                 .findElement(By.xpath("//div[@data-testid='item-qty']")).getText();
-            //         int actualQuantity = Integer.parseInt(quantityString);
-            //         while (true) {
-            //             if (actualQuantity < quantity) {
-            //                 WebElement plusIcon = driver.findElement(
-            //                         By.cssSelector("svg[data-testid='AddOutlinedIcon']"));
-            //                 plusIcon.click();
-            //             } else if (actualQuantity > quantity) {
-            //                 WebElement minusIcon = driver.findElement(
-            //                         By.cssSelector("svg[data-testid='RemoveOutlinedIcon']"));
-            //                 minusIcon.click();
-            //             }
-            //             Thread.sleep(2000);
-            //             if (quantity == 0) {
-            //                 break;
-            //             }
-            //             quantityString = cartItemElement
-            //                     .findElement(By.xpath("//div[@data-testid='item-qty']")).getText();
-            //             actualQuantity = Integer.parseInt(quantityString);
-            //             if (actualQuantity == quantity) {
-            //                 // break;
-            //             }
-            //         }
-            //     }
-            // }
-            // return false;
-            List<WebElement> cartElem = driver.findElements(By.xpath("//div[@class='MuiBox-root css-1gjj37g']"));
-            //List<String> cartProducts = new ArrayList<>();
-            for (WebElement e : cartElem)
-            {
-                Thread.sleep(2000);
-                if(e.findElement(By.xpath("div[1]")).getText().equals(productName))
-                {
-                    WebElement quantityValue = e.findElement(By.xpath("div/div"));
-                    int q = Integer.valueOf(quantityValue.getText().trim());
-                   if(q<quantity)
-                    {
-                        while(q!=quantity)
-                        {
-                            Thread.sleep(1000);
-                            e.findElement(By.xpath("div[2]/div/button[2]")).click();
-                            q++;
-                            
+            List<WebElement> cartItemElements = driver.findElements(By.xpath(
+                    "//div[@class='cart MuiBox-root css-0']//div[@class='MuiBox-root css-0']"));
+            for (WebElement cartItemElement : cartItemElements) {
+                String actualProductName = cartItemElement
+                        .findElement(By.xpath("//div[@class='MuiBox-root css-1gjj37g']/div[1]"))
+                        .getText();
+                if (actualProductName.equals(productName)) {
+                    String quantityString = cartItemElement
+                            .findElement(By.xpath("//div[@data-testid='item-qty']")).getText();
+                    int actualQuantity = Integer.parseInt(quantityString);
+                    while (true) {
+                        if (actualQuantity < quantity) {
+                            WebElement plusIcon = driver.findElement(
+                                    By.cssSelector("svg[data-testid='AddOutlinedIcon']"));
+                            plusIcon.click();
+                        } else if (actualQuantity > quantity) {
+                            WebElement minusIcon = driver.findElement(
+                                    By.cssSelector("svg[data-testid='RemoveOutlinedIcon']"));
+                            minusIcon.click();
                         }
-                        break;
-                    }
-                    else if(q>quantity) 
-                    {
-                        while(q!=quantity)
-                        {
-                        e.findElement(By.xpath("div[2]/div/button[1]")).click();;
-                        q--;
+                        Thread.sleep(2000);
+                        if (quantity == 0) {
+                            break;
                         }
-                        break;
+                        quantityString = cartItemElement
+                                .findElement(By.xpath("//div[@data-testid='item-qty']")).getText();
+                        actualQuantity = Integer.parseInt(quantityString);
+                        if (actualQuantity == quantity) {
+                            break;
+                        }
                     }
                 }
             }
-            /* 
-            if(s.contains(productName))
-                {
-                    if(quantity==0)
-                    {
-                        Thread.sleep(2000);
-                        driver.findElement(By.xpath("//*[@id='root']/div/div/div[3]/div[2]/div/div[1]/div/div[2]/div[2]/div[1]/button[1]")).click();
-                        return true;
-                    }
-                    else if(quantity>0)
-                    {
-                        Thread.sleep(2000);
-                        driver.findElement(By.xpath("//*[@id='root']/div/div/div[3]/div[2]/div/div[1]/div/div[2]/div[2]/div[1]/button[2]")).click();
-                        return true;
-                    }
-
-
-
-
-            */ 
-            // Increment or decrement the quantity of the matching product until the current
-            // quantity is reached (Note: Keep a look out when then input quantity is 0,
-            // here we need to remove the item completely from the cart)
-            return true;
+            return false;
+            
         } catch (Exception e) {
             if (quantity == 0)
                 return true;
