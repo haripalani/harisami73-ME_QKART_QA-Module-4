@@ -4,9 +4,12 @@
 package QKART_SANITY_LOGIN.Module1;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -17,15 +20,18 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.JavascriptExecutor;
 
 public class QkartSanity {
 
     public static String lastGeneratedUserName;
+    // private static Object TakesScreenshot;
 
 
     public static RemoteWebDriver createDriver() throws MalformedURLException {
@@ -43,6 +49,22 @@ public class QkartSanity {
                 message, status));
     }
 
+    public static void takeScreenshot(WebDriver driver, String screenshotType, String description) throws IOException {
+        // TODO: CRIO_TASK_MODULE_SYNCHRONISATION - Implement method using below steps
+        /*
+         * 1. Check if the folder "/screenshots" exists, create if it doesn't
+         * 2. Generate a unique string using the timestamp
+         * 3. Capture screenshot
+         * 4. Save the screenshot inside the "/screenshots" folder using the following
+         * naming convention: screenshot_<Timestamp>_<ScreenshotType>_<Description>.png
+         * eg: screenshot_2022-03-05T06:59:46.015489_StartTestcase_Testcase01.png
+         */
+        Date currentdate = new Date();
+        String Screenshotfilename = currentdate.toString().replace("","_");
+        File ScreenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        FileUtils.copyFile(ScreenshotFile, new File("screenshots"+ Screenshotfilename + ".png"));
+
+    }
 
     /*
      * Testcase01: Verify the functionality of Login button on the Home page
@@ -110,7 +132,7 @@ public class QkartSanity {
         // registered user's credentials
         registration.navigateToRegisterPage();
         status = registration.registerUser(lastGeneratedUserName, "abc@123", false);
-
+        driver.getCurrentUrl();
         // If status is true, then registration succeeded, else registration has
         // failed. In this case registration failure means Success
         logStatus("End TestCase", "Test Case 2: Verify user Registration : ", status ? "FAIL" : "PASS");
@@ -128,7 +150,8 @@ public class QkartSanity {
         Home homePage = new Home(driver);
         homePage.navigateToHome();
 
-        Thread.sleep(5000);
+        // SLEEP_STMT_01 : Wait for Page to Load
+        // Thread.sleep(5000);
 
         // Search for the "yonex" product
         status = homePage.searchForProduct("yonex");
@@ -160,6 +183,7 @@ public class QkartSanity {
         }
 
         logStatus("Step Success", "Successfully validated the search results ", "PASS");
+        // SLEEP_STMT_02
         Thread.sleep(2000);
 
         // Search for product
@@ -196,13 +220,15 @@ public class QkartSanity {
         // Visit home page
         Home homePage = new Home(driver);
         homePage.navigateToHome();
+        // takeScreenshot(driver, "starttestcase", "tc04");
 
-        Thread.sleep(5000);
+        // SLEEP_STMT_03 : Wait for page to load
+        // Thread.sleep(5000);
 
         // Search for product and get card content element of search results
         status = homePage.searchForProduct("Running Shoes");
-        Thread.sleep(3000);
         List<WebElement> searchResults = homePage.getSearchResults();
+        Thread.sleep(3000);
 
         // Create expected values
         List<String> expectedTableHeaders = Arrays.asList("Size", "UK/INDIA", "EU", "HEEL TO TOE");
@@ -217,20 +243,25 @@ public class QkartSanity {
 
             // Verify if the size chart exists for the search result
             if (result.verifySizeChartExists()) {
-                logStatus("Step Success", "Successfully validated presence of Size Chart Link", "PASS");
+                logStatus("Step Success", "Successfully validated presence of Size Chart Link",
+                        "PASS");
 
                 // Verify if size dropdown exists
                 status = result.verifyExistenceofSizeDropdown(driver);
-                logStatus("Step Success", "Validated presence of drop down", status ? "PASS" : "FAIL");
+                logStatus("Step Success", "Validated presence of drop down",
+                        status ? "PASS" : "FAIL");
 
                 // Open the size chart
                 if (result.openSizechart()) {
                     Thread.sleep(3000);
                     // Verify if the size chart contents matches the expected values
-                    if (result.validateSizeChartContents(expectedTableHeaders, expectedTableBody, driver)) {
-                        logStatus("Step Success", "Successfully validated contents of Size Chart Link", "PASS");
+                    if (result.validateSizeChartContents(expectedTableHeaders, expectedTableBody,
+                            driver)) {
+                        logStatus("Step Success",
+                                "Successfully validated contents of Size Chart Link", "PASS");
                     } else {
-                        logStatus("Step Failure", "Failure while validating contents of Size Chart Link", "FAIL");
+                        logStatus("Step Failure",
+                                "Failure while validating contents of Size Chart Link", "FAIL");
                     }
 
                     // Close the size chart modal
@@ -247,8 +278,9 @@ public class QkartSanity {
             }
         }
         logStatus("TestCase 4", "Test Case PASS. Validated Size Chart Details", "PASS");
+        // takeScreenshot(driver, "endcase", "tc04");
         return status;
-    }
+}
 
     /*
      * Verify the complete flow of checking out and placing order for products is
@@ -302,6 +334,7 @@ public class QkartSanity {
 
         // Place the order
         checkoutPage.placeOrder();
+        // SLEEP_STMT_04: Wait for place order to succeed and navigate to Thanks page
         Thread.sleep(3000);
 
         // Check if placing order redirected to the Thansk page
@@ -386,15 +419,13 @@ public class QkartSanity {
         Register registration = new Register(driver);
         Login login = new Login(driver);
         Home homePage = new Home(driver);
-
-        // TODO: CRIO_TASK_MODULE_TEST_AUTOMATION - TEST CASE 07: MILESTONE 6
-        // TODO: Register a new user
         registration.navigateToRegisterPage();
         status = registration.registerUser("testUser", "abc@123", true);
-        // TODO: Login using the newly created user
         lastGeneratedUserName = registration.lastGeneratedUsername;
         login.navigateToLoginPage();
         status = login.PerformLogin(lastGeneratedUserName, "abc@123");
+
+        homePage.navigateToHome();
 
         homePage.navigateToHome();
         status = homePage.searchForProduct("Stylecon");
@@ -473,6 +504,261 @@ public class QkartSanity {
         return status;
     }
 
+    public static Boolean TestCase09(RemoteWebDriver driver) throws InterruptedException {
+        Boolean status;
+
+        // TODO: CRIO_TASK_MODULE_SYNCHRONISATION -
+        logStatus("Start TestCase",
+                "Test Case 9: Add Test Case for Multitab Scenario",
+                "DONE");
+
+        Register registration = new Register(driver);
+        registration.navigateToRegisterPage();
+        status = registration.registerUser("testUser", "abc@123", true);
+        if (!status) {
+            logStatus("Step Failure", "User Perform Registration Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase",
+                    "Test Case 9: Add Test Case for Multitab Scenario: ",
+                    status ? "PASS" : "FAIL");
+            return false;
+        }
+        lastGeneratedUserName = registration.lastGeneratedUsername;
+
+        Login login = new Login(driver);
+        login.navigateToLoginPage();
+        status = login.PerformLogin(lastGeneratedUserName, "abc@123");
+        if (!status) {
+            logStatus("Step Failure", "User Perform Login Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase",
+                    "Test Case 9: Verify products added to cart in one tab is present in other TAB: ",
+                    status ? "PASS" : "FAIL");
+            return false;
+        }
+
+        Home homePage = new Home(driver);
+        homePage.navigateToHome();
+        
+        status = homePage.searchForProduct("Yonex");
+        homePage.addProductToCart("YONEX Smash Badminton Racquet");
+
+        String urlHome = driver.getCurrentUrl();
+        System.out.println(driver.getWindowHandles().size());
+        String str = driver.getWindowHandle();
+        System.out.println(str + "Handle ID Parent");
+        
+
+        driver.switchTo().newWindow(WindowType.TAB);
+        
+        System.out.println(driver.getWindowHandles().size());
+        String str1 = driver.getWindowHandle();
+        System.out.println(str1 + "Handle ID Child");
+        // driver.switchTo().window(str);
+        // System.out.println(str + "Handle ID Parent");
+        driver.navigate().to(urlHome);
+        // status = homePage.searchForProduct("Yonex");
+        // homePage.addProductToCart("YONEX Smash Badminton Racquet");
+        
+
+        Thread.sleep(3000);
+
+        // homePage.changeProductQuantityinCart("YONEX Smash Badminton Racquet", 5);
+
+        // homePage.clickCheckout();
+
+        // Checkout checkoutPage = new Checkout(driver);
+        // checkoutPage.addNewAddress("Addr line 1 addr Line 2 addr line 3");
+        // checkoutPage.selectAddress("Addr line 1 addr Line 2 addr line 3");
+
+        // checkoutPage.placeOrder();
+        // Thread.sleep(3000);
+
+        // status = checkoutPage.verifyInsufficientBalanceMessage();
+
+        logStatus("End TestCase",
+                "Test Case 9: Verify products added to cart in one tab is present in other TAB: ",
+                status ? "PASS" : "FAIL");
+        return status;
+    }
+
+    public static Boolean TestCase10(RemoteWebDriver driver) throws InterruptedException {
+        // TODO: CRIO_TASK_MODULE_SYNCHRONISATION -
+        logStatus("TestCase 10", "Start test case : Verify Privacy Policy and Terms of Service", "DONE");
+        Boolean status=false;
+        Home homePage = new Home(driver);
+    homePage.navigateToHome();
+    String parent = driver.getWindowHandle();
+	// System.out.println(parent);
+    // Scrolls the page to bottom
+    Thread.sleep(5000);
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+    Thread.sleep(5000);
+	driver.findElement(By.linkText("Privacy policy")).click();
+            homePage.verifyHomePageUrl();
+			Set<String> it = driver.getWindowHandles();
+            for(String actual: it)
+            {
+                if(!actual.equalsIgnoreCase(parent))
+                {
+                    driver.switchTo().window(actual);
+                    break;
+                }
+            }
+            String privacy = driver.getWindowHandle();
+            // System.out.println(privacy + " Handle ID");
+			//  System.out.println(driver.getCurrentUrl());
+             Thread.sleep(5000);
+            if(driver.getCurrentUrl().contains("privacy-policy"))
+            {
+                // System.out.println("Switched to Privacy tab succesful");
+                status = true;
+                logStatus("Step Success", "Switched to Privacy tab succesful", status ? "PASS" : "FAIL");
+                // driver.close();
+                Thread.sleep(5000);
+            }else
+                status = false;
+            driver.close();
+            Thread.sleep(5000);
+            driver.switchTo().window(parent);
+            driver.findElement(By.linkText("Terms of Service")).click();
+            Thread.sleep(5000);
+            homePage.verifyHomePageUrl();
+            Set<String> itt = driver.getWindowHandles();
+            // System.out.println(itt.size());
+            for(String actual: itt)
+            {
+                if(!(actual.equalsIgnoreCase(parent) || actual.equalsIgnoreCase(privacy)))
+                {
+                    driver.switchTo().window(actual);
+                    break;
+                }
+            }
+            // System.out.println(driver.getCurrentUrl());
+    
+            if(driver.getCurrentUrl().contains("terms-of-service"))
+            {
+                // System.out.println("Switched to terms-of-service succesful");
+                
+                status = true;
+                logStatus("Step Success", "Switched to terms-of-service succesful", status ? "PASS" : "FAIL");
+                Thread.sleep(5000);
+                logStatus("End TestCase","Test Case 10: Verify Privacy Policy and Terms of Service: ",status ? "PASS" : "FAIL");
+            }
+            else status = false;{}
+            driver.close();
+            Thread.sleep(5000);
+            driver.switchTo().window(parent);
+
+        return status;
+    }
+
+    public static Boolean TestCase11(RemoteWebDriver driver) throws InterruptedException {
+        logStatus("TestCase 11", "Start test case : verify that the Contact us link works fine", "DONE");
+        Boolean status=false;
+        Home homePage = new Home(driver);
+        homePage.navigateToHome();
+        // String parent = driver.getWindowHandle();
+	    // System.out.println(parent);
+    // Scrolls the page to bottom
+        Thread.sleep(5000);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        Thread.sleep(5000);
+        status = homePage.contact("crio user", "criouser@gmail.com", "Testing the contact us page");
+        if (!status) {
+            logStatus("TestCase 11", "Test Case Failure. Unable to verify the contact us link", "FAIL");
+            return false;
+        }
+        logStatus("Step Success", "Successfully validated the Contact US link ", "PASS");
+        logStatus("End TestCase","Test Case 11: verify that the Contact us link works fine: ",status ? "PASS" : "FAIL");
+        return status;
+    }
+
+    public static Boolean TestCase12(RemoteWebDriver driver) throws InterruptedException {
+        Boolean status;
+        logStatus("Start TestCase", "Test Case 12: Verify if the advertisements are displayed correctly", "DONE");
+
+        // Go to the Register page
+        Register registration = new Register(driver);
+        registration.navigateToRegisterPage();
+
+        // Register a new user
+        status = registration.registerUser("testUser", "abc@123", true);
+        if (!status) {
+            logStatus("TestCase 12", "Test Case Failure. Verify if the advertisements are displayed correctly", "FAIL");
+        }
+
+        // Save the username of the newly registered user
+        lastGeneratedUserName = registration.lastGeneratedUsername;
+
+        // Go to the login page
+        Login login = new Login(driver);
+        login.navigateToLoginPage();
+
+        // Login with the newly registered user's credentials
+        status = login.PerformLogin(lastGeneratedUserName, "abc@123");
+        if (!status) {
+            logStatus("Step Failure", "User Perform Login Failed", status ? "PASS" : "FAIL");
+            logStatus("End TestCase", "Test Case 12: Verify if the advertisements are displayed correctly : ", status ? "PASS" : "FAIL");
+        }
+
+        // Go to the home page
+        Home homePage = new Home(driver);
+        homePage.navigateToHome();
+
+        // Find required products by searching and add them to the user's cart
+        status = homePage.searchForProduct("Yonex");
+        homePage.addProductToCart("YONEX Smash Badminton Racquet");
+
+        // Click on the checkout button
+        homePage.clickCheckout();
+
+        // Add a new address on the Checkout page and select it
+        Checkout checkoutPage = new Checkout(driver);
+        checkoutPage.addNewAddress("Addr line 1 addr Line 2 addr line 3");
+        checkoutPage.selectAddress("Addr line 1 addr Line 2 addr line 3");
+
+        // Place the order
+        checkoutPage.placeOrder();
+        // SLEEP_STMT_04: Wait for place order to succeed and navigate to Thanks page
+        Thread.sleep(5000);
+        status = driver.getCurrentUrl().endsWith("/thanks");
+        status=checkoutPage.advertisement();
+        logStatus("Step Success", "Test Case 12: Displaying Advertisement: ", status ? "PASS" : "FAIL");
+        
+        // Check if placing order redirected to the Thansk page
+        List<WebElement> frames = driver.findElements(By.tagName("iframe"));
+        if(frames.size()==3)
+        {
+            status = true;
+            logStatus("Step Success", "Test Case 12: Verify that the buttons on the 2 QKART product advertisements are clickable: ", status ? "PASS" : "FAIL");
+            System.out.println("All frames verified");
+            
+            
+        }
+        else status = false;
+
+        driver.switchTo().frame(0);
+        driver.findElement(By.xpath("//button[text()='Buy Now']")).click();
+        driver.navigate().back();
+        driver.switchTo().parentFrame();
+
+        driver.switchTo().frame(1);
+        driver.findElement(By.xpath("//button[text()='Buy Now']")).click();
+        driver.navigate().back();
+
+        driver.switchTo().parentFrame();
+        
+        // Go to the home page
+        homePage.navigateToHome();
+        Thread.sleep(3000);
+
+        // Log out the user
+        homePage.PerformLogout();
+
+        logStatus("End TestCase", "Test Case 12: Verify if the advertisements are displayed correctly: ", status ? "PASS" : "FAIL");
+        return status;
+    }
 
     public static void main(String[] args) throws InterruptedException, MalformedURLException {
         int totalTests = 0;
@@ -484,7 +770,7 @@ public class QkartSanity {
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 
         try {
-            //Execute Test Case 1
+            // Execute Test Case 1
             totalTests += 1;
             status = TestCase01(driver);
             if (status) {
@@ -493,7 +779,7 @@ public class QkartSanity {
 
             System.out.println("");
 
-        //     // Execute Test Case 2
+            // Execute Test Case 2
             totalTests += 1;
             status = TestCase02(driver);
             if (status) {
@@ -501,16 +787,16 @@ public class QkartSanity {
             }
 
             System.out.println("");
-        //     // Execute Test Case 3
-           totalTests += 1;
+            // Execute Test Case 3
+            totalTests += 1;
             status = TestCase03(driver);
-             if (status) {
-             passedTests += 1;
-             }
+            if (status) {
+            passedTests += 1;
+            }
 
             System.out.println("");
 
-        //     // Execute Test Case 4
+            // Execute Test Case 4
             totalTests += 1;
             status = TestCase04(driver);
             if (status) {
@@ -519,7 +805,7 @@ public class QkartSanity {
 
             System.out.println("");
 
-        //     // Execute Test Case 5
+            // Execute Test Case 5
             totalTests += 1;
             status = TestCase05(driver);
             if (status) {
@@ -555,6 +841,41 @@ public class QkartSanity {
 
             System.out.println("");
 
+            // Execute Test Case 9
+            totalTests += 1;
+            status = TestCase09(driver);
+            if (status) {
+            passedTests += 1;
+            }
+
+            System.out.println("");
+
+            // Execute Test Case 10
+            totalTests += 1;
+            status = TestCase10(driver);
+            if (status) {
+            passedTests += 1;
+            }
+
+            System.out.println("");
+
+            // Execute Test Case 11
+            totalTests += 1;
+            status = TestCase11(driver);
+            if (status) {
+            passedTests += 1;
+            }
+
+            System.out.println("");
+
+            // Execute Test Case 12
+            totalTests += 1;
+            status = TestCase12(driver);
+            if (status) {
+            passedTests += 1;
+            }
+
+            System.out.println("");
         } catch (Exception e) {
             throw e;
         } finally {
